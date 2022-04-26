@@ -41,10 +41,13 @@ class MainWindow:
         self.generate_pass.grid(column=2, row=3, sticky="ew", padx=3, pady=3)
 
         self.add_button = Button(text="Add", width=36, command=self.add_password)
-        self.add_button.grid(column=1, row=4, columnspan=2, sticky="ew", padx=3, pady=3)
+        self.add_button.grid(column=1, row=4, sticky="ew", padx=3, pady=3)
 
         self.search_button = Button(text="Search", command=self.search_pass)
         self.search_button.grid(column=2, row=1, sticky="ew", padx=3, pady=3)
+        
+        self.logout_btn = Button(text="Logout", command=self.logout)
+        self.logout_btn.grid(column=2, row=4, sticky="ew", padx=3, pady=3)
 
         self.window.mainloop()
 
@@ -122,6 +125,10 @@ class MainWindow:
                 finally:
                     self.website_tf.delete(0, END)
                     self.password_tf.delete(0, END)
+                    
+    def logout(self):
+        self.window.destroy()
+        Login()
 
 
 class SignUp:
