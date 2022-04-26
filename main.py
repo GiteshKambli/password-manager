@@ -5,8 +5,27 @@ import random
 import pyperclip
 
 
+def encrypt(message):
+    key = 3
+    result = ""
+
+    for letter in message:
+        result += chr(ord(letter) + key)
+
+    return result
+
+
+def decrypt(message):
+    key = 3
+    result = ""
+
+    for letter in message:
+        result += chr(ord(letter) - key)
+
+    return result
+
+
 class MainWindow:
-    # ---------------------------- UI SETUP ------------------------------- #
     def __init__(self, username):
         self.username = username
         self.window = Tk()
@@ -45,13 +64,12 @@ class MainWindow:
 
         self.search_button = Button(text="Search", command=self.search_pass)
         self.search_button.grid(column=2, row=1, sticky="ew", padx=3, pady=3)
-        
+
         self.logout_btn = Button(text="Logout", command=self.logout)
         self.logout_btn.grid(column=2, row=4, sticky="ew", padx=3, pady=3)
 
         self.window.mainloop()
 
-    # ---------------------------- PASSWORD SEARCH ------------------------------- #
     def search_pass(self):
         website = self.website_tf.get()
         try:
@@ -59,7 +77,7 @@ class MainWindow:
                 data = json.load(file)[self.username]
                 if website in data:
                     email = data[website]['email']
-                    password = data[website]['password']
+                    password = decrypt(data[website]['password'])
                     pyperclip.copy(password)
                     messagebox.showinfo(title=website,
                                         message=f"Email: {email}\nPassword: {password}\n\nPassword copied to clipboard!")
@@ -67,8 +85,6 @@ class MainWindow:
                     messagebox.showinfo(title=website, message="Password not saved")
         except FileNotFoundError:
             messagebox.showinfo(title="Oops", message="No file found")
-
-    # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 
     def generate_password(self):
         letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
@@ -78,12 +94,9 @@ class MainWindow:
                    'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
         numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
         symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
-        nr_letters = random.randint(8, 10)
-        nr_symbols = random.randint(2, 4)
-        nr_numbers = random.randint(2, 4)
-        password_letters = [random.choice(letters) for _ in range(nr_letters)]
-        password_symbols = [random.choice(symbols) for _ in range(nr_symbols)]
-        password_numbers = [random.choice(numbers) for _ in range(nr_numbers)]
+        password_letters = [random.choice(letters) for _ in range(10)]
+        password_symbols = [random.choice(symbols) for _ in range(3)]
+        password_numbers = [random.choice(numbers) for _ in range(3)]
         password_list = password_letters + password_symbols + password_numbers
         random.shuffle(password_list)
         generated_password = "".join(password_list)
@@ -91,11 +104,10 @@ class MainWindow:
         self.password_tf.insert(0, generated_password)
         pyperclip.copy(generated_password)
 
-    # ---------------------------- SAVE PASSWORD ------------------------------- #
     def add_password(self):
         website = self.website_tf.get()
         email = self.email_tf.get()
-        password = self.password_tf.get()
+        password = encrypt(self.password_tf.get())
         new_data = {
             website: {
                 "email": email,
@@ -125,7 +137,7 @@ class MainWindow:
                 finally:
                     self.website_tf.delete(0, END)
                     self.password_tf.delete(0, END)
-                    
+
     def logout(self):
         self.window.destroy()
         Login()
@@ -176,7 +188,7 @@ class SignUp:
 
         new_data = {
             user_name: {
-                "password": new_pass
+                "password": encrypt(new_pass)
             }
         }
         if len(user_name) == 0 or len(new_pass) == 0 or len(con_pass) == 0:
@@ -244,7 +256,7 @@ class Login:
         with open('data.json', 'r') as file:
             data = json.load(file)
             if user_name in data:
-                if password == data[user_name]['password']:
+                if password == decrypt(data[user_name]['password']):
                     self.window.destroy()
                     MainWindow(user_name)
 
