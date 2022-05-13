@@ -107,11 +107,11 @@ class MainWindow:
     def add_password(self):
         website = self.website_tf.get()
         email = self.email_tf.get()
-        password = encrypt(self.password_tf.get())
+        password = self.password_tf.get()
         new_data = {
             website: {
                 "email": email,
-                "password": password
+                "password": encrypt(password)
             }
         }
 
